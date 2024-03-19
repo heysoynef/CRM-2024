@@ -4,10 +4,10 @@
 // $dbPassword = 'Hola.mundo!@94*';
 // $dbName = 'u901451733_gcrm';
 
-$dbHost = '154.56.47.154';
-$dbUsuario = 'u304955714_crm';
-$dbPassword = 'Monkey2023**';
-$dbName = 'u304955714_crm';
+$dbHost = 'localhost';
+$dbUsuario = 'root';
+$dbPassword = '';
+$dbName = 'crm';
 
 $conn = mysqli_connect($dbHost, $dbUsuario, $dbPassword, $dbName);
 
