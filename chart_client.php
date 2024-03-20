@@ -2,7 +2,7 @@
 session_start(); // Iniciar sesión
 
 // Verificar si el paciente no ha iniciado sesión
-if (!isset($_SESSION["id"])) {
+if (!isset ($_SESSION["id"])) {
     // Redireccionar al formulario de inicio de sesión
     header("Location: index.php");
     exit();
@@ -12,69 +12,57 @@ include 'layouts/header.php';
 include 'db.php';
 
 // Recibo por GET la tabla del cliente a consultar
-$tabla = isset($_GET['tabla']) ? $_GET['tabla'] : '';
+$tabla = isset ($_GET['tabla']) ? $_GET['tabla'] : '';
 
-// Obtener el mes y año actual
-$mesActual = isset($_GET['mes']) ? $_GET['mes'] : date('n');
+// Obtener los meses seleccionados
+$mes1 = isset ($_GET['mes1']) ? $_GET['mes1'] : date('n');
+$mes2 = isset ($_GET['mes2']) ? $_GET['mes2'] : (date('n') - 1);
+
+// Asegúrate de manejar el cambio de año si es necesario
 $añoActual = date('Y');
+$año1 = $mes1 >= date('n') ? $añoActual : $añoActual - 1; // Ajustar año si mes1 es en el futuro
+$año2 = $mes2 >= date('n') ? $añoActual : $añoActual - 1; // Ajustar año si mes2 es en el futuro
 
-// Obtener el número de días del mes actual
-$numDias = cal_days_in_month(CAL_GREGORIAN, $mesActual, $añoActual);
+// Obtener el número de días de cada mes seleccionado
+$numDiasMes1 = cal_days_in_month(CAL_GREGORIAN, $mes1, $año1);
+$numDiasMes2 = cal_days_in_month(CAL_GREGORIAN, $mes2, $año2);
 
-// Calcular el mes y año del mes anterior
-$mesAnterior = $mesActual - 1;
-$añoAnterior = $añoActual;
+// Usar el mayor número de días para el rango de la gráfica
+$numDias = max($numDiasMes1, $numDiasMes2);
 
-// Si el mes anterior es menor que 1, ajustar el mes y año
-if ($mesAnterior < 1) {
-    $mesAnterior = 12;  // Establecer el mes a diciembre
-    $añoAnterior--;    // Restar 1 al año
-}
-
-// Crear un array para almacenar los días del mes actual
+// Crear un array para almacenar los días del mes
 $labels = array();
 for ($dia = 1; $dia <= $numDias; $dia++) {
     $labels[] = $dia;
 }
 
-// Convertir el array de días a formato JSON
 $labelsJSON = json_encode($labels);
 
-// Crear un array para almacenar los leads por día del MES ACTUAL
-$leads = array();
+// Arrays para almacenar los leads de cada mes
+$leadsMes1 = array_fill(0, $numDias, 0); // Rellenar con ceros
+$leadsMes2 = array_fill(0, $numDias, 0); // Rellenar con ceros
 
-// Obtener el recuento de registros por día del MES ACTUAL
+// Obtener los leads para cada mes seleccionado
 for ($dia = 1; $dia <= $numDias; $dia++) {
-    // Consulta para obtener el recuento de registros por día del MES ACTUAL
-    $consulta = "SELECT COUNT(*) AS lead FROM $tabla WHERE DAY(fecha) = $dia AND MONTH(fecha) = $mesActual AND YEAR(fecha) = $añoActual";
-    $resultado = $conn->query($consulta);
-    $fila = $resultado->fetch_assoc();
-    $recuento = $fila['lead'];
+    if ($dia <= $numDiasMes1) {
+        $consultaMes1 = "SELECT COUNT(*) AS lead FROM $tabla WHERE DAY(fecha) = $dia AND MONTH(fecha) = $mes1 AND YEAR(fecha) = $año1";
+        $resultado = $conn->query($consultaMes1);
+        if ($resultado && $fila = $resultado->fetch_assoc()) {
+            $leadsMes1[$dia - 1] = $fila['lead'];
+        }
+    }
 
-    // Agregar el recuento al array
-    $leads[] = $recuento;
+    if ($dia <= $numDiasMes2) {
+        $consultaMes2 = "SELECT COUNT(*) AS lead FROM $tabla WHERE DAY(fecha) = $dia AND MONTH(fecha) = $mes2 AND YEAR(fecha) = $año2";
+        $resultado = $conn->query($consultaMes2);
+        if ($resultado && $fila = $resultado->fetch_assoc()) {
+            $leadsMes2[$dia - 1] = $fila['lead'];
+        }
+    }
 }
 
-// Convertir el array de leads a formato JSON
-$leadsMesActualJSON = json_encode($leads);
-
-// Crear un array para almacenar los leads por día del MES ANTERIOR
-$leadsAnterior = array();
-
-// Obtener el recuento de registros por día del MES ANTERIOR
-for ($dia = 1; $dia <= $numDias; $dia++) {
-    // Consulta para obtener el recuento de registros por día del MES ANTERIOR
-    $consulta = "SELECT COUNT(*) AS lead FROM $tabla WHERE DAY(fecha) = $dia AND MONTH(fecha) = $mesAnterior AND YEAR(fecha) = $añoAnterior";
-    $resultado = $conn->query($consulta);
-    $fila = $resultado->fetch_assoc();
-    $recuento = $fila['lead'];
-
-    // Agregar el recuento al array
-    $leadsAnterior[] = $recuento;
-}
-
-// Convertir el array de leads del MES ANTERIOR a formato JSON
-$leadsMesAnteriorJSON = json_encode($leadsAnterior);
+$leadsMes1JSON = json_encode($leadsMes1);
+$leadsMes2JSON = json_encode($leadsMes2);
 
 // Cerrar la conexión a la base de datos
 $conn->close();
@@ -83,18 +71,18 @@ $conn->close();
 <div class="container">
     <div class="row">
         <div class="col-md-8">
-            <h4 class="mb-3">Gráfico, mes actual ó seleccionado VS anterior de <?= $tabla ?></h4>
+            <h4 class="mb-3">Gráfico, mes actual ó seleccionado VS anterior de
+                <?= $tabla ?>
+            </h4>
             <small>Aquí se vera un comparativo del mes actual contra el mes anterior dependiendo del cliente.</small>
             <br>
             <small>Presiona F5 para ver datos aleatorios en la gráfica.</small>
         </div>
         <div class="col-md-4">
-            <select name="mes" id="mes" class="form-control my-2">
-                <option disabled>Selecciona un mes</option>
+            <select name="mes1" id="mes1" class="form-control my-2">
+                <option disabled selected>Selecciona un mes</option>
                 <?php
-                $mesActual = date('m');  // Obtener el número del mes actual
-                $mesSeleccionado = $_GET['mes'] ?? $mesActual;  // Obtener el valor del parámetro 'mes' de la URL, o el mes actual si no está presente
-
+                $mes1Seleccionado = $_GET['mes1'] ?? date('m');  // Valor por defecto para el primer selector
                 $nombresMeses = array(
                     '01' => 'Enero',
                     '02' => 'Febrero',
@@ -109,99 +97,91 @@ $conn->close();
                     '11' => 'Noviembre',
                     '12' => 'Diciembre'
                 );
-
                 foreach ($nombresMeses as $mesNumero => $nombreMes) {
-                    $mesSeleccionadoHTML = ($mesSeleccionado == $mesNumero) ? 'selected' : '';
-                    printf('<option value="%s" %s>%s</option>', $mesNumero, $mesSeleccionadoHTML, $nombreMes);
+                    echo '<option value="' . $mesNumero . '"' . ($mes1Seleccionado == $mesNumero ? ' selected' : '') . '>' . $nombreMes . '</option>';
+                }
+                ?>
+            </select>
+
+            <select name="mes2" id="mes2" class="form-control my-2">
+                <option disabled selected>Selecciona un mes</option>
+                <?php
+                $mes2Seleccionado = $_GET['mes2'] ?? date('m');  // Valor por defecto para el primer selector
+                $nombresMeses = array(
+                    '01' => 'Enero',
+                    '02' => 'Febrero',
+                    '03' => 'Marzo',
+                    '04' => 'Abril',
+                    '05' => 'Mayo',
+                    '06' => 'Junio',
+                    '07' => 'Julio',
+                    '08' => 'Agosto',
+                    '09' => 'Septiembre',
+                    '10' => 'Octubre',
+                    '11' => 'Noviembre',
+                    '12' => 'Diciembre'
+                );
+                $mes1Nombre = $nombresMeses[sprintf("%02d", $mes1)];
+                $mes2Nombre = $nombresMeses[sprintf("%02d", $mes2)];
+                foreach ($nombresMeses as $mesNumero => $nombreMes) {
+                    echo '<option value="' . $mesNumero . '"' . ($mes2Seleccionado == $mesNumero ? ' selected' : '') . '>' . $nombreMes . '</option>';
                 }
                 ?>
             </select>
 
             <script>
-                // Obtener el elemento select por su id
-                const selectMes = document.getElementById('mes');
+                const selectMes1 = document.getElementById('mes1');
+                const selectMes2 = document.getElementById('mes2');
 
-                // Agregar un evento change al elemento select
-                selectMes.addEventListener('change', function() {
-                    const mesSeleccionado = selectMes.value; // Obtener el valor seleccionado
+                const actualizarPaginaConMeses = () => {
+                    const tabla = '<?php echo $tabla; ?>'; // Asegúrate de que esta variable se ha definido correctamente en tu script PHP
+                    window.location.href = `chart_client.php?mes1=${selectMes1.value}&mes2=${selectMes2.value}&tabla=${tabla}`;
+                };
 
-                    // Obtener el valor de la tabla
-                    const tabla = '<?php echo $tabla; ?>';
-
-                    // Redirigir a la misma página con el nuevo mes y tabla seleccionados
-                    window.location.href = 'chart_client.php?mes=' + mesSeleccionado + '&tabla=' + tabla;
-                });
+                selectMes1.addEventListener('change', actualizarPaginaConMeses);
+                selectMes2.addEventListener('change', actualizarPaginaConMeses);
             </script>
-
         </div>
+
     </div>
 
     <canvas class="mb-5" id="myChart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
     const ctx = document.getElementById('myChart');
-
-    const backgroundColorMesActual = 'rgba(239, 72, 46, 0.8)';
-    const backgroundColorMesAnterior = 'rgba(29, 158, 245, 0.8)';
-    const lineColorMesActual = 'rgba(239, 72, 46, 1)';
-    const lineColorMesAnterior = 'rgba(29, 158, 245, 1)';
-
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: <?php echo $labelsJSON; ?>,
             datasets: [{
-                label: 'Mes Actual',
-                data: <?php echo $leadsMesActualJSON; ?>,
-                backgroundColor: backgroundColorMesActual,
-                borderColor: lineColorMesActual,
+                label: '<?php echo $mes1Nombre; ?>',
+                data: <?php echo $leadsMes1JSON; ?>,
+                backgroundColor: 'rgba(239, 72, 46, 0.8)',
+                borderColor: 'rgba(239, 72, 46, 1)',
                 fill: false
             }, {
-                label: 'Mes Anterior',
-                data: <?php echo $leadsMesAnteriorJSON; ?>,
-                backgroundColor: backgroundColorMesAnterior,
-                borderColor: lineColorMesAnterior,
+                label: '<?php echo $mes2Nombre; ?>',
+                data: <?php echo $leadsMes2JSON; ?>,
+                backgroundColor: 'rgba(29, 158, 245, 0.8)',
+                borderColor: 'rgba(29, 158, 245, 1)',
                 fill: false
             }]
         },
         options: {
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: {
-                        font: {
-                            family: 'Kumbh Sans', // Cambio a Kumbh Sans
-                        },
-                        precision: 0
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            family: 'Kumbh Sans', // Cambio a Kumbh Sans
-                        }
-                    }
+                    beginAtZero: true
                 }
             },
             plugins: {
                 legend: {
-                    labels: {
-                        font: {
-                            family: 'Kumbh Sans', // Cambio a Kumbh Sans
-                        }
-                    }
+                    position: 'top',
                 },
-                tooltip: {
-                    titleFont: {
-                        family: 'Kumbh Sans', // Cambio a Kumbh Sans
-                        weight: 'lighter'
-                    },
-                    bodyFont: {
-                        family: 'Kumbh Sans', // Cambio a Kumbh Sans
-                    }
+                title: {
+                    display: true,
+                    text: 'Comparación de Leads por Día'
                 }
             }
         }
@@ -209,6 +189,4 @@ $conn->close();
 </script>
 
 
-<?php
-include 'layouts/footer.php'
-?>
+<?php include 'layouts/footer.php'; ?>
