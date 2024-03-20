@@ -2,7 +2,7 @@
 session_start(); // Iniciar sesión
 
 // Verificar si el paciente no ha iniciado sesión
-if (!isset($_SESSION["id"])) {
+if (!isset ($_SESSION["id"])) {
     // Redireccionar al formulario de inicio de sesión
     header("Location: index.php");
     exit();
@@ -12,13 +12,13 @@ include 'layouts/header.php';
 include 'db.php';
 
 // Recibo por GET la tabla del cliente a consultar
-$tabla = isset($_GET['tabla']) ? $_GET['tabla'] : '';
+$tabla = isset ($_GET['tabla']) ? $_GET['tabla'] : '';
 
 // Obtener los meses y años seleccionados
-$mes1 = isset($_GET['mes1']) ? $_GET['mes1'] : date('n');
-$mes2 = isset($_GET['mes2']) ? $_GET['mes2'] : (date('n') - 1);
-$anio1 = isset($_GET['anio1']) ? $_GET['anio1'] : date('Y');
-$anio2 = isset($_GET['anio2']) ? $_GET['anio2'] : date('Y');
+$mes1 = isset ($_GET['mes1']) ? $_GET['mes1'] : date('n');
+$mes2 = isset ($_GET['mes2']) ? $_GET['mes2'] : (date('n') - 1);
+$anio1 = isset ($_GET['anio1']) ? $_GET['anio1'] : date('Y');
+$anio2 = isset ($_GET['anio2']) ? $_GET['anio2'] : date('Y');
 
 // Obtener el número de días de cada mes seleccionado
 $numDiasMes1 = cal_days_in_month(CAL_GREGORIAN, $mes1, $anio1);
@@ -66,15 +66,16 @@ $conn->close();
 ?>
 <div class="container">
     <div class="row">
-        <div class="col-md-8">
-            <h4 class="mb-3">Gráfico, mes actual o seleccionado VS anterior de
+        <div class="col-md-12">
+            <h4 class="mb-3 text-center">Gráfico, mes actual o seleccionado VS anterior de
                 <?= $tabla ?>
             </h4>
-            <small>Aquí se vera un comparativo del mes actual contra el mes anterior dependiendo del cliente.</small>
-            <br>
-            <small>Presiona F5 para ver datos aleatorios en la gráfica.</small>
+            <p class="text-center">Aquí se vera un comparativo del mes actual contra el mes anterior dependiendo del cliente.</p>
+            <p class="text-center">Presiona F5 para ver datos aleatorios en la gráfica.</p>
         </div>
-        <div class="col-md-4">
+    </div>
+    <div class="row">
+        <div class="col-md-3">
             <select name="mes1" id="mes1" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un mes</option>
                 <?php
@@ -98,7 +99,9 @@ $conn->close();
                 }
                 ?>
             </select>
-
+            
+        </div>
+        <div class="col-md-3">
             <!-- Selector de año para mes1 -->
             <select name="anio1" id="anio1" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un año</option>
@@ -109,7 +112,8 @@ $conn->close();
                 }
                 ?>
             </select>
-
+        </div>
+        <div class="col-md-3">
             <select name="mes2" id="mes2" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un mes</option>
                 <?php
@@ -119,8 +123,8 @@ $conn->close();
                 }
                 ?>
             </select>
-
-            <!-- Selector de año para mes2 -->
+        </div>
+        <div class="col-md-3">
             <select name="anio2" id="anio2" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un año</option>
                 <?php
@@ -129,29 +133,29 @@ $conn->close();
                 }
                 ?>
             </select>
-
-            <script>
-                const selectMes1 = document.getElementById('mes1');
-                const selectAnio1 = document.getElementById('anio1');
-                const selectMes2 = document.getElementById('mes2');
-                const selectAnio2 = document.getElementById('anio2');
-
-                const actualizarPaginaConMesesYAnios = () => {
-                    const tabla = '<?php echo $tabla; ?>';
-                    window.location.href = `chart_client.php?mes1=${selectMes1.value}&anio1=${selectAnio1.value}&mes2=${selectMes2.value}&anio2=${selectAnio2.value}&tabla=${tabla}`;
-                };
-
-                selectMes1.addEventListener('change', actualizarPaginaConMesesYAnios);
-                selectAnio1.addEventListener('change', actualizarPaginaConMesesYAnios);
-                selectMes2.addEventListener('change', actualizarPaginaConMesesYAnios);
-                selectAnio2.addEventListener('change', actualizarPaginaConMesesYAnios);
-            </script>
         </div>
+        <!-- Selector de año para mes2 -->
+
+        <script>
+            const selectMes1 = document.getElementById('mes1');
+            const selectAnio1 = document.getElementById('anio1');
+            const selectMes2 = document.getElementById('mes2');
+            const selectAnio2 = document.getElementById('anio2');
+
+            const actualizarPaginaConMesesYAnios = () => {
+                const tabla = '<?php echo $tabla; ?>';
+                window.location.href = `chart_client.php?mes1=${selectMes1.value}&anio1=${selectAnio1.value}&mes2=${selectMes2.value}&anio2=${selectAnio2.value}&tabla=${tabla}`;
+            };
+
+            selectMes1.addEventListener('change', actualizarPaginaConMesesYAnios);
+            selectAnio1.addEventListener('change', actualizarPaginaConMesesYAnios);
+            selectMes2.addEventListener('change', actualizarPaginaConMesesYAnios);
+            selectAnio2.addEventListener('change', actualizarPaginaConMesesYAnios);
+        </script>
     </div>
 
-    <canvas id="myChart"></canvas>
+<canvas id="myChart"></canvas>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('myChart').getContext('2d');
