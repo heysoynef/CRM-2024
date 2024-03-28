@@ -34,39 +34,37 @@
                                         <!-- <h4 class="mt-3 mb-3 pb-1">We are Monkey's Team</h4> -->
                                     </div>
 
-                                    <form action="logic/register_add.php" method="POST">
+                                    <form action="logic/register_add.php" method="POST" autocomplete="off">
                                         <p>Por favor, ingrese a sus datos</p>
 
                                         <div class="form-outline mb-4">
-                                            <input type="text" name="name" id="name" class="form-control" placeholder="" />
+                                            <input type="text" name="name" id="name" class="form-control" placeholder="" autocomplete="off" value="" />
                                             <label class="form-label" for="name">Nombre Completo</label>
                                         </div>
 
                                         <div class="form-outline mb-4">
-                                            <input type="email" name="email" id="email" class="form-control" placeholder="" />
+                                            <input type="email" name="email" id="email" class="form-control" placeholder="" autocomplete="off" value="" />
                                             <label class="form-label" for="email">Correo Electrónico</label>
                                         </div>
 
                                         <div class="form-outline mb-4">
-                                            <input type="password" name="password" id="password" class="form-control" />
+                                            <input type="password" name="password" id="password" class="form-control" autocomplete="off" value="" />
                                             <label class="form-label" for="password">Contraseña</label>
                                         </div>
 
                                         <div class="form-outline mb-4">
-                                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" />
+                                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" autocomplete="off" value="" />
                                             <label class="form-label" for="confirm_password">Confirmar Contraseña</label>
                                         </div>
 
                                         <div class="text-center pt-1 mb-3 pb-1">
                                             <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" type="submit">Sign up</button>
-                                            <!-- <a class="text-muted" href="#!">¿Olvidaste tu contraseña?</a> -->
                                         </div>
 
                                         <div class="d-flex align-items-center justify-content-center pb-4">
                                             <p class="mb-0 me-2">¿Ya tienes una cuenta?</p>
                                             <a href="index.php" class="btn btn-outline-danger">Iniciar Sesión</a>
                                         </div>
-
                                     </form>
 
                                 </div>

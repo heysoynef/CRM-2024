@@ -17,6 +17,10 @@ include '../db.php';
         body {
             font-family: 'Kumbh Sans', sans-serif;
         }
+
+        a {
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -29,18 +33,24 @@ include '../db.php';
         $email = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
         $confirmPassword = htmlspecialchars($_POST["confirm_password"]);
+        $type = "CLIENT";
 
         // Validar los datos (puedes agregar más validaciones según tus necesidades)
         if (empty($name) || empty($email) || empty($password) || empty($confirmPassword)) {
-            echo '<div style="text-align: center; margin-top: 20px;">Por favor, completa todos los campos del formulario.</div>';
+            echo '<div style="text-align: center; margin-top: 20px;">Por favor, completa todos los campos del formulario.
+            <br><br><a href="../register.php">Regresar</a></div>';
         } elseif ($password !== $confirmPassword) {
-            echo '<div style="text-align: center; margin-top: 20px;">Las contraseñas no coinciden.</div>';
+            echo '<div style="text-align: center; margin-top: 20px;">Las contraseñas no coinciden.
+            <br><br><a href="../register.php">Regresar</a></div>';
         } elseif (!preg_match("/^[a-zA-Z ]*$/", $name)) {
-            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Nombre\' solo permite letras y espacios.</div>';
+            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Nombre\' solo permite letras y espacios.
+            <br><br><a href="../register.php">Regresar</a></div>';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Email\' no tiene un formato válido.</div>';
+            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Email\' no tiene un formato válido.
+            <br><br><a href="../register.php">Regresar</a></div>';
         } elseif (strlen($password) < 8) {
-            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Password\' debe tener al menos 8 caracteres.</div>';
+            echo '<div style="text-align: center; margin-top: 20px;">El campo \'Password\' debe tener al menos 8 caracteres.
+            <br><br><a href="../register.php">Regresar</a></div>';
         } else {
             // Verificar si el usuario ya está registrado
             $email = mysqli_real_escape_string($conn, $email);
@@ -56,7 +66,7 @@ include '../db.php';
                 // Insertar los datos en la base de datos
                 $name = mysqli_real_escape_string($conn, $name);
                 $hashedPassword = mysqli_real_escape_string($conn, $hashedPassword);
-                $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+                $sql = "INSERT INTO users (name, email, password, type) VALUES ('$name', '$email', '$password', '$type')";
 
                 if (mysqli_query($conn, $sql)) {
                     echo '<div style="text-align: center; margin-top: 20px;">

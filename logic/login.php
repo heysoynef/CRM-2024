@@ -46,7 +46,7 @@
                 $_SESSION["type"] = $row["type"];
                 $_SESSION["logged_in"] = true;
 
-                // Redireccionar a calendar.php u otra página de tu elección
+                // Redireccionar a chart.php u otra página de tu elección
                 header("Location: ../chart.php?type=" . $_SESSION['type']);
                 exit();
             } else {
