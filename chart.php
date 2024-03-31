@@ -8,6 +8,16 @@ if (!isset($_SESSION["id"])) {
     exit();
 }
 
+// Verificar si el usuario tiene el tipo "cliente"
+if ($_SESSION["type"] === "Cliente") {
+    // Obtener el nombre del campo de cliente del usuario
+    $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
+
+    // Redirigir al usuario a chart.php con los parámetros adecuados
+    header("Location: chart_client.php?tabla=" . urlencode($nombre_campo_cliente));
+    exit();
+}
+
 include 'layouts/header.php';
 include 'db.php';
 
@@ -23,6 +33,22 @@ if ($result && $result->num_rows > 0) {
         if ($tabla != 'users') {
             $tablas[] = $tabla; // Agrega el nombre de la tabla al array $tablas, excluyendo la tabla "users"
         }
+    }
+}
+
+function obtenerNombreCampoCliente($id_usuario) {
+    include 'db.php'; // Incluir la conexión a la base de datos
+
+    // Consulta SQL para obtener el nombre del campo de cliente del usuario
+    $sql = "SELECT cliente FROM users WHERE id = $id_usuario"; // Ajusta esto según tu estructura de base de datos y nombres de tablas y campos
+
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row["cliente"];
+    } else {
+        return ""; // Si no se encuentra el campo, retorna una cadena vacía
     }
 }
 
@@ -146,8 +172,8 @@ $conn->close();
     });
 </script>
 
-
-
 <?php
-include 'layouts/footer.php'
+include 'layouts/footer.php';
 ?>
+
+

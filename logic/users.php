@@ -57,8 +57,9 @@ if (isset($_POST['registrar'])) {
         $name = htmlspecialchars($_POST["name"]);
         $email = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
-        $confirmPassword = htmlspecialchars($_POST["confirm_password"]);
         $type = htmlspecialchars($_POST["type"]);
+        // Manejar el valor de client_id basado en el tipo de usuario
+        $client_id = ($type === 'Cliente' && isset($_POST["client_id"])) ? htmlspecialchars($_POST["client_id"]) : null;
 
         // Verificar si el usuario ya está registrado
         $email = mysqli_real_escape_string($conn, $email);
@@ -73,13 +74,10 @@ if (isset($_POST['registrar'])) {
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
-            // Aplicar hash a la contraseña
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Solo si se necesita
-
-            // Insertar los datos en la base de datos
-            $sql = "INSERT INTO users (name, email, password, type) VALUES (?, ?, ?, ?)";
+            // Insertar los datos en la base de datos incluyendo el campo 'cliente' si es necesario
+            $sql = "INSERT INTO users (name, email, password, type, cliente) VALUES (?, ?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $password, $type);
+            mysqli_stmt_bind_param($stmt, "sssss", $name, $email, $password, $type, $client_id);
 
             if (mysqli_stmt_execute($stmt)) {
                 $_SESSION['notification'] = "Registro exitoso.";
@@ -93,6 +91,7 @@ if (isset($_POST['registrar'])) {
         }
     }
 }
+
 
 if (isset($_POST['actualizar'])) {
     // Validar los datos (puedes agregar más validaciones según tus necesidades)
@@ -119,27 +118,29 @@ if (isset($_POST['actualizar'])) {
         $email = htmlspecialchars($_POST["email"]);
         $password = htmlspecialchars($_POST["password"]);
         $type = htmlspecialchars($_POST["type"]);
+        // Aquí manejo el valor de client_id basado en el tipo de usuario
+        $client_id = ($type === 'Cliente' && isset($_POST["client_id"])) ? htmlspecialchars($_POST["client_id"]) : null;
 
-        // Actualizar los datos del usuario
-        $sql_update = "UPDATE users SET name = ?, email = ?, password = ?, type = ? WHERE id = ?";
+        // Preparar la consulta para actualizar los datos del usuario
+        // Incluir el campo 'cliente' solo si es relevante
+        $sql_update = "UPDATE users SET name = ?, email = ?, password = ?, type = ?, cliente = ? WHERE id = ?";
         $stmt_update = mysqli_prepare($conn, $sql_update);
-        mysqli_stmt_bind_param($stmt_update, "ssssi", $name, $email, $password, $type, $id);
+        mysqli_stmt_bind_param($stmt_update, "sssssi", $name, $email, $password, $type, $client_id, $id);
 
         if (mysqli_stmt_execute($stmt_update)) {
             // Actualización exitosa
             $_SESSION['notification'] = "Datos actualizados correctamente.";
-            // Redireccionar a la página actual para mostrar la notificación
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         } else {
             // Error al actualizar los datos
             $_SESSION['notification'] = "Error al actualizar los datos del usuario: " . mysqli_error($conn);
-            // Redireccionar a la página actual para mostrar la notificación
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
         }
     }
 }
+
 
 // *** BORRAR USUARIO ***
 // Verifica si se ha enviado el formulario para eliminar el registro
@@ -168,3 +169,43 @@ if (isset($_POST['borrar'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
+
+?>
+<script>
+    // Función para imprimir los datos del formulario en la consola
+    function printFormData(formData) {
+        // Convertimos los datos del formulario a un objeto JSON
+        const jsonData = {};
+        formData.forEach((value, key) => {
+            jsonData[key] = value;
+        });
+        // Imprimimos los datos en la consola del navegador
+        console.log(jsonData);
+    }
+
+    // Escuchamos el evento submit del formulario
+    document.addEventListener('submit', function(event) {
+        // Obtenemos el formulario que se está enviando
+        const form = event.target;
+        // Convertimos los datos del formulario a un objeto FormData
+        const formData = new FormData(form);
+        // Llamamos a la función para imprimir los datos en la consola
+        printFormData(formData);
+        // Almacenamos los datos en el almacenamiento local del navegador
+        localStorage.setItem('formData', JSON.stringify(Array.from(formData.entries())));
+    });
+
+    // Verificamos si hay datos almacenados en el almacenamiento local
+    window.addEventListener('DOMContentLoaded', function() {
+        const storedFormData = localStorage.getItem('formData');
+        if (storedFormData) {
+            const formData = new FormData();
+            JSON.parse(storedFormData).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+            // Llamamos a la función para imprimir los datos en la consola
+            printFormData(formData);
+        }
+    });
+</script>
+
