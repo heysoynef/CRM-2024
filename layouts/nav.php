@@ -1,3 +1,8 @@
+<?php
+// Obtener el nombre de la tabla de la URL
+$tabla = isset($_GET['tabla']) ? $_GET['tabla'] : "";
+?>
+
 <div class="site-mobile-menu site-navbar-target">
     <div class="site-mobile-menu-header">
         <div class="site-mobile-menu-close mt-3">
@@ -79,16 +84,18 @@
                         // Verificar el tipo de usuario
                         if ($sessionType === "Cliente") {
                             ?>
-                            <li id="opcion_usuarios" style="display: none;"><a href="users.php"
-                                    class="nav-link">Usuarios</a></li>
-                                    
+                            <li id="option_users" style="display: none;"><a href="users.php" class="nav-link">Usuarios</a>
+                            </li>
+                            <li id="export"><a href="data.php?id=<?php echo urlencode($tabla); ?>"
+                                    class="nav-link">Exportar</a></li>
+
                             <?php
                         } else {
                             ?>
-                            <li id="opcion_usuarios"><a href="users.php" class="nav-link">Usuarios</a></li>
-                            <li id="opcion_cliente"><a href="clients.php" class="nav-link">Clientes</a></li>
+                            <li id="option_users"><a href="users.php" class="nav-link">Usuarios</a></li>
+                            <li id="option_client"><a href="clients.php" class="nav-link">Clientes</a></li>
                             <?php
-                            
+
                         }
                         ?>
                         <li><a href="logic/logout.php?logout=true" class="nav-link">Salir</a></li>
@@ -104,8 +111,8 @@
 
                     if (sessionType === "Cliente") {
                         // Ocultar las opciones del menú "Clientes" y "Usuarios"
-                        document.getElementById("opcion_cliente").style.display = "none";
-                        document.getElementById("opcion_usuarios").style.display = "none";
+                        document.getElementById("option_client").style.display = "none";
+                        document.getElementById("option_users").style.display = "none";
 
                         // Mostrar un mensaje de alerta
                         alert("No tienes permisos para realizar esta acción.");
@@ -131,3 +138,4 @@
         </div>
     </div>
 </header>
+
