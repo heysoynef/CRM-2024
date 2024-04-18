@@ -9,7 +9,7 @@ if (!isset($_SESSION["id"])) {
 }
 
 // Verificar si el usuario tiene el tipo "cliente"
-if ($_SESSION["type"] === "Cliente") {
+if ($_SESSION["type"] === "Cliente" ) {
     // Obtener el nombre del campo de cliente del usuario
     $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
 

@@ -1,12 +1,14 @@
 <?php
 session_start(); // Iniciar sesión
 
-// Verificar si el paciente no ha iniciado sesión
+// Verificar si el usuario no ha iniciado sesión
 if (!isset($_SESSION["id"])) {
     // Redireccionar al formulario de inicio de sesión
     header("Location: index.php");
     exit();
 }
+
+
 
 include 'logic/users.php';
 include 'layouts/header.php';

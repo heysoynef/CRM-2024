@@ -88,7 +88,6 @@ $tabla = isset($_GET['tabla']) ? $_GET['tabla'] : "";
                             </li>
                             <li id="export"><a href="data.php?id=<?php echo urlencode($tabla); ?>"
                                     class="nav-link">Exportar</a></li>
-
                             <?php
                         } else {
                             ?>

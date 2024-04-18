@@ -44,6 +44,7 @@
                 $_SESSION["name"] = $row["name"];
                 $_SESSION["email"] = $row["email"];
                 $_SESSION["type"] = $row["type"];
+                $_SESSION["Cliente"] = $row[""];
                 $_SESSION["logged_in"] = true;
 
                 // Redireccionar a chart.php u otra página de tu elección
