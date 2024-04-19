@@ -8,6 +8,36 @@ if (!isset($_SESSION["id"])) {
     exit();
 }
 
+// Verificar si el usuario tiene el tipo "cliente"
+if ($_SESSION["type"] === "Cliente" ) {
+    //obtener el nombre de la tabla mediante GET
+    $tabla = isset ($_GET['id']) ? $_GET['id'] : '';
+    // Obtener el nombre del campo de cliente del usuario
+    $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
+    //verificar si el cliente es el mismo de la url para proteccion de datos
+    if($nombre_campo_cliente!=$tabla){
+    // Redirigir al usuario a chart.php con los parámetros adecuados
+    header("Location: data.php?id=" . urlencode($nombre_campo_cliente));
+    exit();
+    }
+}
+
+function obtenerNombreCampoCliente($id_usuario) {
+    include 'db.php'; // Incluir la conexión a la base de datos
+
+    // Consulta SQL para obtener el nombre del campo de cliente del usuario
+    $sql = "SELECT cliente FROM users WHERE id = $id_usuario"; // Ajusta esto según tu estructura de base de datos y nombres de tablas y campos
+
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row["cliente"];
+    } else {
+        return ""; // Si no se encuentra el campo, retorna una cadena vacía
+    }
+}
+
 include 'layouts/header.php';
 include 'db.php';
 

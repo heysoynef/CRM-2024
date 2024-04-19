@@ -9,9 +9,11 @@ if (!isset ($_SESSION["id"])) {
 }
 // Verificar si el usuario tiene el tipo "cliente"
 if ($_SESSION["type"] === "Cliente" ) {
+    //obtener el nombre de la tabla mediante GET
     $tabla = isset ($_GET['tabla']) ? $_GET['tabla'] : '';
     // Obtener el nombre del campo de cliente del usuario
     $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
+    //verificar si el cliente es el mismo de la url para proteccion de datos
     if($nombre_campo_cliente!=$tabla){
     // Redirigir al usuario a chart.php con los parámetros adecuados
     header("Location: chart_client.php?tabla=" . urlencode($nombre_campo_cliente));
