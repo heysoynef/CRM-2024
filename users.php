@@ -73,6 +73,67 @@ if (isset($_POST["registrar"])) {
             </button>
         </div>
         <div class="col">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h3 class="mt-3">Cliente</h3>
+                        <!-- Botón para abrir el modal de agregar usuario tipo cliente -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModalCliente">
+                            Nuevo 
+                        </button>
+                    </div>
+                    <div class="col">
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para agregar usuario tipo cliente -->
+            <div class="modal fade" id="myModalCliente" tabindex="-1" role="dialog"
+                aria-labelledby="myModalClienteTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalClienteTitle">Agregar Cliente</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="" method="POST">
+                                <div class="form-group">
+                                    <label for="name">Nombre:</label>
+                                    <input type="text" class="form-control" id="name" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email:</label>
+                                    <input type="text" class="form-control" id="email" name="email">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="text" class="form-control" id="password" name="password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm_password">Confirmar Password:</label>
+                                    <input type="text" class="form-control" id="confirm_password"
+                                        name="confirm_password">
+                                </div>
+                                <!-- Campo oculto para indicar el tipo de usuario -->
+                                <input type="hidden" name="type" value="Cliente">
+                                <div class="form-group" id="tableSelect" >
+                                    <label for="client_id">Selecciona El Cliente Registrado:</label>
+                                    <select class="form-control" name="client_id" id="client_id">
+                                        <option value="" disabled selected>Selecciona</option>
+                                        <!-- Las opciones se llenarán con JavaScript -->
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary" name="registrar">Guardar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -221,16 +282,7 @@ if (isset($_POST["registrar"])) {
                             <option value="" disabled selected>Selecciona</option>
                             <option value="Super_Admin">Super Administrador</option>
                             <option value="Administrador">Administrador</option>
-                            <option value="Cliente">Cliente</option>
                         </select>
-
-                        <div class="form-group" id="tableSelect" style="display: none;">
-                            <label for="client_id">Selecciona El Cliente Registrado:</label>
-                            <select class="form-control" name="client_id" id="client_id">
-                                <option value="" disabled selected>Selecciona</option>
-                                <!-- Las opciones se llenarán con JavaScript -->
-                            </select>
-                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary" name="registrar">Guardar</button>
                 </form>
@@ -271,16 +323,7 @@ if (isset($_POST["registrar"])) {
                             <option value="" disabled selected>Selecciona</option>
                             <option value="Super_Admin">Super Administrador</option>
                             <option value="Administrador">Administrador</option>
-                            <option value="Cliente">Cliente</option>
                         </select>
-                        <div class="form-group" id="tableSelect" style="display: none;">
-                            <label for="client_id">Selecciona El cliente registrado:</label>
-                            <select class="form-control" name="client_id" id="client_id">
-                                <option value="" disabled selected>Selecciona</option>
-                                <!-- Las opciones se llenarán con JavaScript -->
-                            </select>
-                        </div>
-
                     </div>
                     <button type="submit" name="actualizar" class="btn btn-primary mt-3">Actualizar</button>
                 </form>
@@ -325,48 +368,48 @@ if (isset($_POST["registrar"])) {
     });
 
     $(document).ready(function () {
-    // Convertir los nombres de las tablas de PHP a una variable de JavaScript
-    var tables = <?php echo $tablesJson; ?>;
+        // Convertir los nombres de las tablas de PHP a una variable de JavaScript
+        var tables = <?php echo $tablesJson; ?>;
 
-    // Función para actualizar las opciones del selector de tablas para el formulario de registro
-    function updateTableOptionsForRegister() {
-        $('#client_id').empty().append('<option value="" disabled selected>Selecciona</option>');
-        tables.forEach(function (table) {
-            $('#client_id').append($('<option></option>').attr('value', table).text(table));
-        });
-    }
-
-    // Función para actualizar las opciones del selector de tablas para el formulario de edición
-    function updateTableOptionsForEdit() {
-        $('#client_id').empty().append('<option value="" disabled selected>Selecciona</option>');
-        tables.forEach(function (table) {
-            $('#client_id').append($('<option></option>').attr('value', table).text(table));
-        });
-    }
-
-    // Mostrar u ocultar el selector de tablas basado en el tipo de usuario seleccionado
-    $('#type').change(function () {
-        if ($(this).val() === 'Cliente') {
-            $('#tableSelect').show(); // Asegúrate de que este es el contenedor correcto para el formulario de registro
-            updateTableOptionsForRegister();
-        } else {
-            $('#tableSelect').hide(); // Asegúrate de que este es el contenedor correcto para el formulario de registro
+        // Función para actualizar las opciones del selector de tablas para el formulario de registro
+        function updateTableOptionsForRegister() {
+            $('#client_id').empty().append('<option value="" disabled selected>Selecciona</option>');
+            tables.forEach(function (table) {
+                $('#client_id').append($('<option></option>').attr('value', table).text(table));
+            });
         }
-    });
 
-    $('#edit_type').change(function () {
-        if ($(this).val() === 'Cliente') {
-            $('#edit_tableSelect').show(); // Asegúrate de que este es el contenedor correcto para el formulario de edición
-            updateTableOptionsForEdit();
-        } else {
-            $('#edit_tableSelect').hide(); // Asegúrate de que este es el contenedor correcto para el formulario de edición
+        // Función para actualizar las opciones del selector de tablas para el formulario de edición
+        function updateTableOptionsForEdit() {
+            $('#client_id').empty().append('<option value="" disabled selected>Selecciona</option>');
+            tables.forEach(function (table) {
+                $('#client_id').append($('<option></option>').attr('value', table).text(table));
+            });
         }
-    });
 
-    // Llamada inicial para asegurarse de que las opciones están actualizadas al cargar la página
-    updateTableOptionsForRegister();
-    updateTableOptionsForEdit();
-});
+        // Mostrar u ocultar el selector de tablas basado en el tipo de usuario seleccionado
+        $('#type').change(function () {
+            if ($(this).val() === 'Cliente') {
+                $('#tableSelect').show(); // Asegúrate de que este es el contenedor correcto para el formulario de registro
+                updateTableOptionsForRegister();
+            } else {
+                $('#tableSelect').hide(); // Asegúrate de que este es el contenedor correcto para el formulario de registro
+            }
+        });
+
+        $('#edit_type').change(function () {
+            if ($(this).val() === 'Cliente') {
+                $('#edit_tableSelect').show(); // Asegúrate de que este es el contenedor correcto para el formulario de edición
+                updateTableOptionsForEdit();
+            } else {
+                $('#edit_tableSelect').hide(); // Asegúrate de que este es el contenedor correcto para el formulario de edición
+            }
+        });
+
+        // Llamada inicial para asegurarse de que las opciones están actualizadas al cargar la página
+        updateTableOptionsForRegister();
+        updateTableOptionsForEdit();
+    });
 
 </script>
 

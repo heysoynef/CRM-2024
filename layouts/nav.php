@@ -76,7 +76,7 @@ $tabla = isset($_GET['tabla']) ? $_GET['tabla'] : "";
             <div class="col-12">
                 <nav class="site-navigation text-right ml-auto " role="navigation">
                     <ul class="site-menu main-menu js-clone-nav ml-auto d-none d-lg-block">
-                        <li id="opcion_mes"><a href="chart.php" class="nav-link">Mes</a></li>
+                        <li id="opcion_mes"><a href="chart.php" class="nav-link">Graficos</a></li>
                         <?php
                         // Obtener el tipo de usuario de la sesión
                         $sessionType = isset($_SESSION["type"]) ? trim($_SESSION["type"]) : "";

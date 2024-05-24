@@ -171,6 +171,7 @@ $conn->close();
         }
     });
 </script>
+<!-- Formulario para subir el archivo CSV -->
 
 <?php
 include 'layouts/footer.php';
