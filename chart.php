@@ -57,16 +57,14 @@ $labels = array_map('strtoupper', $tablas);
 $leads = array();
 
 $currentMonth = date('m'); // Obtener el número del mes actual
+$currentYear = date('Y'); // Obtener el año actual
 
-if (isset($_GET['mes'])) {
-    $selectedMonth = $_GET['mes'];
-} else {
-    $selectedMonth = $currentMonth; // Establecer el mes actual como predeterminado
-}
- 
-// Consulta SQL para obtener el número de registros en el mes seleccionado para cada tabla
+$selectedMonth = isset($_GET['mes']) ? $_GET['mes'] : $currentMonth; // Establecer el mes actual como predeterminado si no se ha seleccionado
+$selectedYear = isset($_GET['anio']) ? $_GET['anio'] : $currentYear; // Establecer el año actual como predeterminado si no se ha seleccionado
+
+// Consulta SQL para obtener el número de registros en el mes y año seleccionados para cada tabla
 foreach ($tablas as $tabla) {
-    $sql = "SELECT COUNT(*) AS total FROM $tabla WHERE MONTH(fecha) = $selectedMonth";
+    $sql = "SELECT COUNT(*) AS total FROM $tabla WHERE MONTH(fecha) = $selectedMonth AND YEAR(fecha) = $selectedYear";
 
     $result = $conn->query($sql);
     if ($result && $result->num_rows > 0) {
@@ -88,7 +86,7 @@ $conn->close();
         </div>
         <div class="col-md-4">
             <form action="" method="get">
-                <select name="mes" id="mes" class="form-control my-2" onchange="this.form.submit()">
+                <select name="mes" id="mes" class="form-control my-2">
                     <option disabled>Selecciona un mes</option>
                     <option value="01" <?php if ($selectedMonth === '01') echo 'selected'; ?>>Enero</option>
                     <option value="02" <?php if ($selectedMonth === '02') echo 'selected'; ?>>Febrero</option>
@@ -103,6 +101,16 @@ $conn->close();
                     <option value="11" <?php if ($selectedMonth === '11') echo 'selected'; ?>>Noviembre</option>
                     <option value="12" <?php if ($selectedMonth === '12') echo 'selected'; ?>>Diciembre</option>
                 </select>
+                <select name="anio" id="anio" class="form-control my-2">
+                    <option disabled>Selecciona un año</option>
+                    <?php
+                    for ($i = 2020; $i <= date('Y'); $i++) { // Puedes ajustar el rango de años según tus necesidades
+                        $anioSeleccionadoHTML = ($selectedYear == $i) ? 'selected' : '';
+                        printf('<option value="%s" %s>%s</option>', $i, $anioSeleccionadoHTML, $i);
+                    }
+                    ?>
+                </select>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
             </form>
         </div>
     </div>
@@ -171,7 +179,6 @@ $conn->close();
         }
     });
 </script>
-<!-- Formulario para subir el archivo CSV -->
 
 <?php
 include 'layouts/footer.php';

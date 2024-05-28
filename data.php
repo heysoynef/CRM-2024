@@ -46,12 +46,24 @@ include 'db.php';
 $tabla = $_GET["id"];
 
 $mesFiltro = isset($_GET["mes"]) ? $_GET["mes"] : "";
+$anioFiltro = isset($_GET["anio"]) ? $_GET["anio"] : "";
 $query = "SELECT * FROM $tabla";
-if (!empty($mesFiltro)) {
-    $query .= " WHERE MONTH(fecha) = '$mesFiltro' ORDER BY id DESC";
+if (!empty($mesFiltro) || !empty($anioFiltro)) {
+    $query .= " WHERE";
+    if (!empty($mesFiltro)) {
+        $query .= " MONTH(fecha) = '$mesFiltro'";
+        if (!empty($anioFiltro)) {
+            $query .= " AND";
+        }
+    }
+    if (!empty($anioFiltro)) {
+        $query .= " YEAR(fecha) = '$anioFiltro'";
+    }
+    $query .= " ORDER BY id DESC";
 } else {
     $mesActual = date('m');  // Obtener el número del mes actual
-    $query .= " WHERE MONTH(fecha) = '$mesActual' ORDER BY id DESC";
+    $anioActual = date('Y'); // Obtener el año actual
+    $query .= " WHERE MONTH(fecha) = '$mesActual' AND YEAR(fecha) = '$anioActual' ORDER BY id DESC";
 }
 
 // Establecer la cantidad de registros por página
@@ -93,7 +105,7 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-4">
             <h3 class="mb-3"><?php echo $_GET["id"] ?></h3>
         </div>
 
@@ -122,6 +134,21 @@ $result = mysqli_query($conn, $query);
                 foreach ($nombresMeses as $mesNumero => $nombreMes) {
                     $mesSeleccionadoHTML = ($mesSeleccionado == $mesNumero) ? 'selected' : '';
                     printf('<option value="%s" %s>%s</option>', $mesNumero, $mesSeleccionadoHTML, $nombreMes);
+                }
+                ?>
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <select name="anio" id="anio" class="form-control my-2">
+                <option disabled>Selecciona un año</option>
+                <?php
+                $anioActual = date('Y');  // Obtener el año actual
+                $anioSeleccionado = $_GET['anio'] ?? $anioActual;  // Obtener el valor del parámetro 'anio' de la URL, o el año actual si no está presente
+
+                for ($i = 2020; $i <= $anioActual; $i++) { // Puedes ajustar el rango de años según tus necesidades
+                    $anioSeleccionadoHTML = ($anioSeleccionado == $i) ? 'selected' : '';
+                    printf('<option value="%s" %s>%s</option>', $i, $anioSeleccionadoHTML, $i);
                 }
                 ?>
             </select>
@@ -219,17 +246,17 @@ $result = mysqli_query($conn, $query);
                         // Mostrar los enlaces de paginación solo si hay más de una página
                         if ($totalPaginas > 1) {
                             if ($paginaActual > 1) {
-                                echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&pagina=' . ($paginaActual - 1) . '" class="pagination-link mx-3">Anterior</a>';
+                                echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&anio=' . $anioFiltro . '&pagina=' . ($paginaActual - 1) . '" class="pagination-link mx-3">Anterior</a>';
                             }
                             for ($i = 1; $i <= $totalPaginas; $i++) {
                                 if ($i == $paginaActual) {
                                     echo '<span class="pagination-link current">' . $i . '</span>';
                                 } else {
-                                    echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&pagina=' . $i . '" class="pagination-link mx-3">' . $i . '</a>';
+                                    echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&anio=' . $anioFiltro . '&pagina=' . $i . '" class="pagination-link mx-3">' . $i . '</a>';
                                 }
                             }
                             if ($paginaActual < $totalPaginas) {
-                                echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&pagina=' . ($paginaActual + 1) . '" class="pagination-link mx-3">Siguiente</a>';
+                                echo '<a href="?id=' . $_GET['id'] . '&mes=' . $mesFiltro . '&anio=' . $anioFiltro . '&pagina=' . ($paginaActual + 1) . '" class="pagination-link mx-3">Siguiente</a>';
                             }
                         }
                         ?>
@@ -237,9 +264,9 @@ $result = mysqli_query($conn, $query);
             <?php
                     // Agregar enlace para descargar el archivo Excel
                     echo '<div class="text-center mt-4">';
-                    // Se genera un enlace con la etiqueta <a> que apunta al archivo "exportar.php" con dos parámetros, "id" y "mes", cuyos valores se obtienen de las variables $id y $mesFiltro respectivamente. El enlace tiene una clase CSS "btn btn-primary" que le da el estilo de un botón primario.
                     $mes = empty($mesFiltro) ? $mesActual : $mesFiltro;
-                    echo '<a href="logic/export.php?id=' . $tabla . '&mes=' . $mes . '" class="btn btn-primary">Exportar a Excel</a>';
+                    $anio = empty($anioFiltro) ? $anioActual : $anioFiltro;
+                    echo '<a href="logic/export.php?id=' . $tabla . '&mes=' . $mes . '&anio=' . $anio . '" class="btn btn-primary">Exportar a Excel</a>';
                     echo '</div>'; // Se cierra el contenedor div.
 
                 } else {
@@ -260,12 +287,26 @@ $result = mysqli_query($conn, $query);
     document.getElementById("mes").addEventListener("change", function() {
         // Obtiene el valor actual del campo de entrada o selección
         var mes = this.value;
+        var anio = document.getElementById("anio").value;
 
         // Obtiene la URL base sin parámetros de consulta
         var url = window.location.href.split('?')[0];
 
-        // Actualiza la URL agregando los parámetros de consulta "id" y "mes" con los valores correspondientes
-        window.location.href = url + '?id=<?php echo $_GET["id"]; ?>&mes=' + mes;
+        // Actualiza la URL agregando los parámetros de consulta "id", "mes" y "anio" con los valores correspondientes
+        window.location.href = url + '?id=<?php echo $_GET["id"]; ?>&mes=' + mes + '&anio=' + anio;
+    });
+
+    // Escucha el evento de cambio en el elemento con el id "anio"
+    document.getElementById("anio").addEventListener("change", function() {
+        // Obtiene el valor actual del campo de entrada o selección
+        var anio = this.value;
+        var mes = document.getElementById("mes").value;
+
+        // Obtiene la URL base sin parámetros de consulta
+        var url = window.location.href.split('?')[0];
+
+        // Actualiza la URL agregando los parámetros de consulta "id", "mes" y "anio" con los valores correspondientes
+        window.location.href = url + '?id=<?php echo $_GET["id"]; ?>&mes=' + mes + '&anio=' + anio;
     });
 
     // Escucha el evento de cambio en el elemento con el id "csvFile"
@@ -281,4 +322,4 @@ $result = mysqli_query($conn, $query);
     });
 </script>
 
-<?php include 'layouts/footer.php'; ?>
+<?php include 'layouts/footer.php'; ?> 
