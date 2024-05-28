@@ -38,7 +38,7 @@ function obtenerConteoRegistros($tabla, $selectedMonth)
 }
 ?>
 
-<div class="container">
+<div class="container" style="height: 100vh;">
     <div class="row mt-3">
         <div class="col-md-8">
             <p>Aquí se muentras los clientes activos dentro de la base de datos del CRM.</p>

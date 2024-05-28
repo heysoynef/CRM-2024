@@ -103,7 +103,7 @@ $result = mysqli_query($conn, $query);
                 <?php
                 $mesActual = date('m');  // Obtener el número del mes actual
                 $mesSeleccionado = $_GET['mes'] ?? $mesActual;  // Obtener el valor del parámetro 'mes' de la URL, o el mes actual si no está presente
-                
+
                 $nombresMeses = array(
                     '01' => 'Enero',
                     '02' => 'Febrero',
@@ -136,7 +136,7 @@ $result = mysqli_query($conn, $query);
             // Imprimir la tabla con los datos obtenidos
             if ($result !== false) {
                 if (mysqli_num_rows($result) > 0) {
-                    ?>
+            ?>
                     <div class="table-responsive">
                         <table class="table">
                             <thead class="thead-dark">
@@ -156,7 +156,7 @@ $result = mysqli_query($conn, $query);
                                 // Imprimir los datos (filas) utilizando un bucle foreach
                                 mysqli_data_seek($result, 0); // Reiniciar el puntero del resultado
                                 while ($row = mysqli_fetch_assoc($result)) {
-                                    ?>
+                                ?>
                                     <tr>
                                         <?php
                                         foreach ($row as $column => $value) {
@@ -173,7 +173,7 @@ $result = mysqli_query($conn, $query);
                                                     // Manejo en caso de que $value sea null
                                                     $truncatedValue = 'No data'; // o cualquier otro valor predeterminado
                                                 }
-                                                ?>
+                                        ?>
                                                 <td data-toggle="modal" data-target="#mensajeModal<?php echo $row['id']; ?>" style="cursor: pointer;"><?php echo $truncatedValue; ?></td>
                                                 <div id="mensajeModal<?php echo $row['id']; ?>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                                                     <div class="modal-dialog modal-lg" role="document">
@@ -193,7 +193,7 @@ $result = mysqli_query($conn, $query);
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <?php
+                                        <?php
                                             } else {
                                                 echo '<td>' . $value . '</td>';
                                             }
@@ -207,7 +207,7 @@ $result = mysqli_query($conn, $query);
                                             </form>
                                         </td>
                                     </tr>
-                                    <?php
+                                <?php
                                 }
                                 ?>
                             </tbody>
@@ -234,14 +234,14 @@ $result = mysqli_query($conn, $query);
                         }
                         ?>
                     </div>
-                    <?php
+            <?php
                     // Agregar enlace para descargar el archivo Excel
                     echo '<div class="text-center mt-4">';
                     // Se genera un enlace con la etiqueta <a> que apunta al archivo "exportar.php" con dos parámetros, "id" y "mes", cuyos valores se obtienen de las variables $id y $mesFiltro respectivamente. El enlace tiene una clase CSS "btn btn-primary" que le da el estilo de un botón primario.
                     $mes = empty($mesFiltro) ? $mesActual : $mesFiltro;
                     echo '<a href="logic/export.php?id=' . $tabla . '&mes=' . $mes . '" class="btn btn-primary">Exportar a Excel</a>';
                     echo '</div>'; // Se cierra el contenedor div.
-            
+
                 } else {
                     echo 'No se encontraron resultados.';
                 }
@@ -257,7 +257,7 @@ $result = mysqli_query($conn, $query);
 </div>
 <script>
     // Escucha el evento de cambio en el elemento con el id "mes"
-    document.getElementById("mes").addEventListener("change", function () {
+    document.getElementById("mes").addEventListener("change", function() {
         // Obtiene el valor actual del campo de entrada o selección
         var mes = this.value;
 
@@ -269,7 +269,7 @@ $result = mysqli_query($conn, $query);
     });
 
     // Escucha el evento de cambio en el elemento con el id "csvFile"
-    document.getElementById('csvFile').addEventListener('change', function (event) {
+    document.getElementById('csvFile').addEventListener('change', function(event) {
         // Pregunta al usuario si desea continuar con la subida del archivo
         var confirmUpload = confirm("¿Desea subir este archivo?");
         if (confirmUpload) {

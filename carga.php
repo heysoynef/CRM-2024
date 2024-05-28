@@ -15,7 +15,7 @@ if (isset($_POST['submit'])) {
 
     // Obtener la configuración de campos del cliente
     $campos = $config['clientes'][$clienteId]; // Array de campos
-    $numCampos = count($campos);//conteo de valores para consultas dinamicas 
+    $numCampos = count($campos); // Conteo de valores para consultas dinámicas 
 
     // Verificar si el archivo fue subido sin errores
     if ($_FILES['csvFile']['error'] == UPLOAD_ERR_OK) {
@@ -36,17 +36,37 @@ if (isset($_POST['submit'])) {
                 $sql = "INSERT INTO " . $clienteId . " (" . implode(',', $campos) . ") VALUES ($placeholders)";
                 $stmt = $conn->prepare($sql);
 
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    if (count($data) == $numCampos) {
-                        // Vincular parámetros y ejecutar la consulta
-                        $types = str_repeat('s', $numCampos); // Asumimos que todos los campos son strings
-                        $stmt->bind_param($types, ...$data);
-                        if (!$stmt->execute()) {
-                            echo "Error al ejecutar la consulta: " . $stmt->error . "<br>";
+                // Iniciar la transacción
+                $conn->begin_transaction();
+
+                try {
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        if (count($data) == $numCampos) {
+                            // Convertir el campo de fecha al formato MySQL
+                            $dateTime = DateTime::createFromFormat('d/m/Y H:i', $data[1]);
+                            if ($dateTime) {
+                                $data[1] = $dateTime->format('Y-m-d H:i:s');
+                            } else {
+                                throw new Exception("Formato de fecha incorrecto: " . $data[1]);
+                            }
+
+                            // Vincular parámetros y ejecutar la consulta
+                            $types = str_repeat('s', $numCampos); // Asumimos que todos los campos son strings
+                            $stmt->bind_param($types, ...$data);
+                            if (!$stmt->execute()) {
+                                throw new Exception("Error al ejecutar la consulta: " . $stmt->error);
+                            }
+                        } else {
+                            echo "La línea CSV no tiene el número correcto de campos: " . implode(",", $data) . "<br>";
                         }
-                    } else {
-                        echo "La línea CSV no tiene el número correcto de campos: " . implode(",", $data) . "<br>";
                     }
+
+                    // Confirmar la transacción
+                    $conn->commit();
+                } catch (Exception $e) {
+                    // Revertir la transacción en caso de error
+                    $conn->rollback();
+                    echo $e->getMessage();
                 }
 
                 fclose($handle);
@@ -72,5 +92,3 @@ if (isset($_POST['submit'])) {
     header("Location: {$url}");
     exit();
 }
-
-?>

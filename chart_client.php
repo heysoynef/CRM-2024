@@ -182,7 +182,7 @@ $conn->close();
         </script>
     </div>
 
-<canvas id="myChart"></canvas>
+<canvas class="mb-5" id="myChart"></canvas>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

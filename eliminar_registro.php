@@ -19,4 +19,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 } else {
     echo "Solicitud no válida.";
 }
-?>
