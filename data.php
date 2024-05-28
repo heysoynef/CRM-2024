@@ -112,7 +112,7 @@ $result = mysqli_query($conn, $query);
 
         </div>
         <div class="col-md-2">
-            <select name="mes" id="mes" class="form-control my-2">
+            <select name="mes" id="mes" class="form-control my-2" style="font-size: 14px;">
                 <option disabled>Selecciona un mes</option>
                 <?php
                 $mesActual = date('m');  // Obtener el número del mes actual
@@ -142,7 +142,7 @@ $result = mysqli_query($conn, $query);
         </div>
 
         <div class="col-md-2">
-            <select name="anio" id="anio" class="form-control my-2">
+            <select name="anio" id="anio" class="form-control my-2" style="font-size: 14px;">
                 <option disabled>Selecciona un año</option>
                 <?php
                 $anioActual = date('Y');  // Obtener el año actual

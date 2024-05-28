@@ -93,7 +93,7 @@ $leadsMes2JSON = json_encode($leadsMes2);
 $conn->close();
 ?>
 <div class="container">
-    <div class="row">
+    <div class="row ">
         <div class="col-md-12">
             <h4 class="mb-3 text-center">Gráfico, mes actual o seleccionado VS anterior de
                 <?= $tabla ?>
@@ -102,8 +102,8 @@ $conn->close();
             <p class="text-center">Presiona F5 para ver datos aleatorios en la gráfica.</p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-3">
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-2">
             <select name="mes1" id="mes1" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un mes</option>
                 <?php
@@ -129,7 +129,7 @@ $conn->close();
             </select>
             
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <!-- Selector de año para mes1 -->
             <select name="anio1" id="anio1" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un año</option>
@@ -141,7 +141,7 @@ $conn->close();
                 ?>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <select name="mes2" id="mes2" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un mes</option>
                 <?php
@@ -152,7 +152,7 @@ $conn->close();
                 ?>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <select name="anio2" id="anio2" class="form-control my-2" style="font-size: 14px;">
                 <option disabled selected>Selecciona un año</option>
                 <?php
