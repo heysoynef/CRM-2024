@@ -6,7 +6,7 @@ if (isset($_POST['submit'])) {
     $config = include 'cargaconf.php';
 
     // Obtener el valor del cliente desde el formulario
-    $clienteId = $_POST['clienteId'];
+    $clienteId = $_POST['clienteId']; //prueba
 
     // Verificar si la configuración del cliente existe
     if (!isset($config['clientes'][$clienteId])) {
@@ -15,7 +15,7 @@ if (isset($_POST['submit'])) {
 
     // Obtener la configuración de campos del cliente
     $campos = $config['clientes'][$clienteId]; // Array de campos
-    $numCampos = count($campos);
+    $numCampos = count($campos);//conteo de valores para consultas dinamicas 
 
     // Verificar si el archivo fue subido sin errores
     if ($_FILES['csvFile']['error'] == UPLOAD_ERR_OK) {

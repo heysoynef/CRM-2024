@@ -63,11 +63,7 @@ $paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
 // Calcular el desplazamiento para la consulta SQL
 $desplazamiento = ($paginaActual - 1) * $registrosPorPagina;
 
-// ANTES - Obtener el número total de registros
-// $resultTotal = mysqli_query($conn, $query);
-// $totalRegistros = mysqli_num_rows($resultTotal);
-
-// AHORA - Obtener el número total de registros
+// Obtener el número total de registros
 $resultTotal = mysqli_query($conn, $query);
 if ($resultTotal !== false) {
     $totalRegistros = mysqli_num_rows($resultTotal);
@@ -78,9 +74,6 @@ if ($resultTotal !== false) {
     echo 'Error en la consulta: ' . mysqli_error($conn);
     exit(); // Salir del script si hay un error en la consulta
 }
-
-// Calcular el número total de páginas
-$totalPaginas = ceil($totalRegistros / $registrosPorPagina);
 
 // Modificar la consulta SQL para incluir la paginación
 $query .= " LIMIT $desplazamiento, $registrosPorPagina";
@@ -93,16 +86,13 @@ $result = mysqli_query($conn, $query);
             <form method="POST" action="carga.php" enctype="multipart/form-data" class="form-group">
                 <input type="file" id="csvFile" name="csvFile" accept=".csv" required style="display: none;">
                 <input type="hidden" name="clienteId" value="<?php echo $_GET['id']; ?>">
-                <button type="button" class="btn btn-primary"
-                    onclick="document.getElementById('csvFile').click();">Subir Archivo</button>
-                <button type="submit" class="btn btn-primary" id="submitBtn" name="submit" style="display: none;">Subir
-                    Archivo CSV</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('csvFile').click();">Subir Archivo</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn" name="submit" style="display: none;">Subir Archivo CSV</button>
             </form>
         </div>
     </div>
 
     <div class="row">
-
         <div class="col-md-8">
             <h3 class="mb-3"><?php echo $_GET["id"] ?></h3>
         </div>
@@ -157,6 +147,7 @@ $result = mysqli_query($conn, $query);
                                     foreach ($row as $column => $value) {
                                         echo '<th class="table-row" scope="col">' . $column . '</th>';
                                     }
+                                    echo '<th scope="col">borrar</th>'; // Añadir una columna para acciones
                                     ?>
                                 </tr>
                             </thead>
@@ -183,10 +174,8 @@ $result = mysqli_query($conn, $query);
                                                     $truncatedValue = 'No data'; // o cualquier otro valor predeterminado
                                                 }
                                                 ?>
-                                                <td data-toggle="modal" data-target="#mensajeModal<?php echo $row['id']; ?>"
-                                                    style="cursor: pointer;"><?php echo $truncatedValue; ?></td>
-                                                <div id="mensajeModal<?php echo $row['id']; ?>" class="modal fade" tabindex="-1"
-                                                    role="dialog" aria-labelledby="myModalLabel">
+                                                <td data-toggle="modal" data-target="#mensajeModal<?php echo $row['id']; ?>" style="cursor: pointer;"><?php echo $truncatedValue; ?></td>
+                                                <div id="mensajeModal<?php echo $row['id']; ?>" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                                                     <div class="modal-dialog modal-lg" role="document">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
@@ -199,8 +188,7 @@ $result = mysqli_query($conn, $query);
                                                                 <?php echo $value; ?>
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary"
-                                                                    data-dismiss="modal">Cerrar</button>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -211,6 +199,13 @@ $result = mysqli_query($conn, $query);
                                             }
                                         }
                                         ?>
+                                        <td>
+                                            <form action="eliminar_registro.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar este registro?');">
+                                                <input type="hidden" name="tabla" value="<?php echo $tabla; ?>">
+                                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                            </form>
+                                        </td>
                                     </tr>
                                     <?php
                                 }
@@ -260,7 +255,6 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
 </div>
-
 <script>
     // Escucha el evento de cambio en el elemento con el id "mes"
     document.getElementById("mes").addEventListener("change", function () {
@@ -273,13 +267,18 @@ $result = mysqli_query($conn, $query);
         // Actualiza la URL agregando los parámetros de consulta "id" y "mes" con los valores correspondientes
         window.location.href = url + '?id=<?php echo $_GET["id"]; ?>&mes=' + mes;
     });
-</script>
-<script>
-    document.getElementById('csvFile').addEventListener('change', function () {
-        document.getElementById('submitBtn').click();
+
+    // Escucha el evento de cambio en el elemento con el id "csvFile"
+    document.getElementById('csvFile').addEventListener('change', function (event) {
+        // Pregunta al usuario si desea continuar con la subida del archivo
+        var confirmUpload = confirm("¿Desea subir este archivo?");
+        if (confirmUpload) {
+            document.getElementById('submitBtn').click();
+        } else {
+            // Si el usuario cancela, limpiar el campo de archivo
+            event.target.value = '';
+        }
     });
 </script>
-
-
 
 <?php include 'layouts/footer.php'; ?>
