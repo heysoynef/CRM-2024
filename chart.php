@@ -9,7 +9,7 @@ if (!isset($_SESSION["id"])) {
 }
 
 // Verificar si el usuario tiene el tipo "cliente"
-if ($_SESSION["type"] === "Cliente" ) {
+if ($_SESSION["type"] === "Cliente") {
     // Obtener el nombre del campo de cliente del usuario
     $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
 
@@ -36,7 +36,8 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-function obtenerNombreCampoCliente($id_usuario) {
+function obtenerNombreCampoCliente($id_usuario)
+{
     include 'db.php'; // Incluir la conexión a la base de datos
 
     // Consulta SQL para obtener el nombre del campo de cliente del usuario
@@ -84,36 +85,56 @@ $conn->close();
             <h3 class="mb-3">Gráfico General</h3>
             <small>Aquí se muestra una gráfica general del mes en curso o del que hayas seleccionado.</small>
         </div>
-        <div class="col-md-4">
+    </div>
+    <div class="row">
+        <div class="col-md-2">
             <form action="" method="get">
                 <select name="mes" id="mes" class="form-control my-2">
                     <option disabled>Selecciona un mes</option>
-                    <option value="01" <?php if ($selectedMonth === '01') echo 'selected'; ?>>Enero</option>
-                    <option value="02" <?php if ($selectedMonth === '02') echo 'selected'; ?>>Febrero</option>
-                    <option value="03" <?php if ($selectedMonth === '03') echo 'selected'; ?>>Marzo</option>
-                    <option value="04" <?php if ($selectedMonth === '04') echo 'selected'; ?>>Abril</option>
-                    <option value="05" <?php if ($selectedMonth === '05') echo 'selected'; ?>>Mayo</option>
-                    <option value="06" <?php if ($selectedMonth === '06') echo 'selected'; ?>>Junio</option>
-                    <option value="07" <?php if ($selectedMonth === '07') echo 'selected'; ?>>Julio</option>
-                    <option value="08" <?php if ($selectedMonth === '08') echo 'selected'; ?>>Agosto</option>
-                    <option value="09" <?php if ($selectedMonth === '09') echo 'selected'; ?>>Septiembre</option>
-                    <option value="10" <?php if ($selectedMonth === '10') echo 'selected'; ?>>Octubre</option>
-                    <option value="11" <?php if ($selectedMonth === '11') echo 'selected'; ?>>Noviembre</option>
-                    <option value="12" <?php if ($selectedMonth === '12') echo 'selected'; ?>>Diciembre</option>
+                    <option value="01" <?php if ($selectedMonth === '01')
+                        echo 'selected'; ?>>Enero</option>
+                    <option value="02" <?php if ($selectedMonth === '02')
+                        echo 'selected'; ?>>Febrero</option>
+                    <option value="03" <?php if ($selectedMonth === '03')
+                        echo 'selected'; ?>>Marzo</option>
+                    <option value="04" <?php if ($selectedMonth === '04')
+                        echo 'selected'; ?>>Abril</option>
+                    <option value="05" <?php if ($selectedMonth === '05')
+                        echo 'selected'; ?>>Mayo</option>
+                    <option value="06" <?php if ($selectedMonth === '06')
+                        echo 'selected'; ?>>Junio</option>
+                    <option value="07" <?php if ($selectedMonth === '07')
+                        echo 'selected'; ?>>Julio</option>
+                    <option value="08" <?php if ($selectedMonth === '08')
+                        echo 'selected'; ?>>Agosto</option>
+                    <option value="09" <?php if ($selectedMonth === '09')
+                        echo 'selected'; ?>>Septiembre</option>
+                    <option value="10" <?php if ($selectedMonth === '10')
+                        echo 'selected'; ?>>Octubre</option>
+                    <option value="11" <?php if ($selectedMonth === '11')
+                        echo 'selected'; ?>>Noviembre</option>
+                    <option value="12" <?php if ($selectedMonth === '12')
+                        echo 'selected'; ?>>Diciembre</option>
                 </select>
-                <select name="anio" id="anio" class="form-control my-2">
-                    <option disabled>Selecciona un año</option>
-                    <?php
-                    for ($i = 2020; $i <= date('Y'); $i++) { // Puedes ajustar el rango de años según tus necesidades
-                        $anioSeleccionadoHTML = ($selectedYear == $i) ? 'selected' : '';
-                        printf('<option value="%s" %s>%s</option>', $i, $anioSeleccionadoHTML, $i);
-                    }
-                    ?>
-                </select>
-                <button type="submit" class="btn btn-primary">Filtrar</button>
             </form>
         </div>
+        <div class="col-md-2"> <select name="anio" id="anio" class="form-control my-2">
+                <option disabled>Selecciona un año</option>
+                <?php
+                for ($i = 2020; $i <= date('Y'); $i++) { // Puedes ajustar el rango de años según tus necesidades
+                    $anioSeleccionadoHTML = ($selectedYear == $i) ? 'selected' : '';
+                    printf('<option value="%s" %s>%s</option>', $i, $anioSeleccionadoHTML, $i);
+                }
+                ?>
+            </select></div>
+        <div class="col-md-4 d-flex  align-items-center">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
     </div>
+
+
+
+
 
     <canvas class="mb-5" id="myChart"></canvas>
 
@@ -183,5 +204,3 @@ $conn->close();
 <?php
 include 'layouts/footer.php';
 ?>
-
-

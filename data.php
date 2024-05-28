@@ -108,8 +108,10 @@ $result = mysqli_query($conn, $query);
         <div class="col-md-4">
             <h3 class="mb-3"><?php echo $_GET["id"] ?></h3>
         </div>
-
         <div class="col-md-4">
+
+        </div>
+        <div class="col-md-2">
             <select name="mes" id="mes" class="form-control my-2">
                 <option disabled>Selecciona un mes</option>
                 <?php
@@ -139,7 +141,7 @@ $result = mysqli_query($conn, $query);
             </select>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-2">
             <select name="anio" id="anio" class="form-control my-2">
                 <option disabled>Selecciona un año</option>
                 <?php
