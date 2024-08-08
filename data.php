@@ -101,6 +101,7 @@ $result = mysqli_query($conn, $query);
                 <button type="button" class="btn btn-primary" onclick="document.getElementById('csvFile').click();">Subir Archivo</button>
                 <button type="submit" class="btn btn-primary" id="submitBtn" name="submit" style="display: none;">Subir Archivo CSV</button>
             </form>
+            <a class="btn btn-success" href="carga_csv/index.php/?tabla=<?php echo $_GET['id']; ?>">Carga CSV</a>
         </div>
     </div>
 
@@ -324,4 +325,4 @@ $result = mysqli_query($conn, $query);
     });
 </script>
 
-<?php include 'layouts/footer.php'; ?> 
+<?php include 'layouts/footer.php'; ?>

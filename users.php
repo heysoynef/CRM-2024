@@ -8,8 +8,6 @@ if (!isset($_SESSION["id"])) {
     exit();
 }
 
-
-
 include 'logic/users.php';
 include 'layouts/header.php';
 
@@ -62,7 +60,6 @@ if (isset($_POST["registrar"])) {
 ?>
 
 <!-- Resto del código HTML -->
-
 
 <div class="container">
     <div class="row">
