@@ -97,7 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Datos cargados exitosamente.<br><br>";
         $mes_actual = date('m'); // Esto obtiene el mes actual en formato numérico (01 a 12)
         echo '<a href="/crm-2024/data.php?id=' . $_POST['tabla'] . '&mes=' . $mes_actual . '" style="text-decoration: none;">Regresar al inicio</a>';
-        session_destroy();
         exit();
     }
 } else {
