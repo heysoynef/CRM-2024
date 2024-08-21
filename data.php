@@ -95,13 +95,13 @@ $result = mysqli_query($conn, $query);
 <div class="container">
     <div class="row justify-content-end">
         <div class="col-md-4">
-            <form method="POST" action="carga.php" enctype="multipart/form-data" class="form-group">
+            <!-- <form method="POST" action="carga.php" enctype="multipart/form-data" class="form-group">
                 <input type="file" id="csvFile" name="csvFile" accept=".csv" required style="display: none;">
                 <input type="hidden" name="clienteId" value="<?php echo $_GET['id']; ?>">
                 <button type="button" class="btn btn-primary" onclick="document.getElementById('csvFile').click();">Subir Archivo</button>
                 <button type="submit" class="btn btn-primary" id="submitBtn" name="submit" style="display: none;">Subir Archivo CSV</button>
-            </form>
-            <a class="btn btn-success" href="carga_csv/index.php/?tabla=<?php echo $_GET['id']; ?>">Carga CSV</a>
+            </form> -->
+            <a class="btn btn-success" href="carga_csv.php/?tabla=<?php echo $_GET['id']; ?>">Carga CSV</a>
         </div>
     </div>
 
