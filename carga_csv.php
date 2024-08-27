@@ -141,17 +141,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($header_db as $column) : ?>
+                            <?php 
+                            // Variable para rastrear si la columna 'id' ya ha sido mapeada
+                            $id_mapeado = false; 
+                            foreach ($header_db as $column) : 
+                            ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($column); ?></td>
                                     <td>
-                                        <select name="map_<?php echo htmlspecialchars($column); ?>" class="form-control">
-                                            <?php foreach ($header_csv as $csv_column) : ?>
-                                                <option value="<?php echo htmlspecialchars($csv_column); ?>">
-                                                    <?php echo htmlspecialchars($csv_column); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <?php if ($column == 'id') : ?>
+                                            <select name="map_<?php echo htmlspecialchars($column); ?>" class="form-control">
+                                                <option value="">-- Ninguno --</option>
+                                                <?php if (in_array('id', $header_csv)) : ?>
+                                                    <option value="id">id</option>
+                                                    <?php $id_mapeado = true; ?>
+                                                <?php endif; ?>
+                                            </select>
+                                        <?php else : ?>
+                                            <select name="map_<?php echo htmlspecialchars($column); ?>" class="form-control">
+                                                <option value="">-- Ninguno --</option>
+                                                <?php foreach ($header_csv as $csv_column) : ?>
+                                                    <?php if ($csv_column !== 'id' || !$id_mapeado) : ?>
+                                                        <option value="<?php echo htmlspecialchars($csv_column); ?>">
+                                                            <?php echo htmlspecialchars($csv_column); ?>
+                                                        </option>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

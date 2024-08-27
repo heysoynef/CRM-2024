@@ -1,13 +1,13 @@
 <?php
-//$dbHost = '65.99.248.156';
-//$dbUsuario = 'wecodesp_crmpavel';
-//$dbPassword = 'p+YZZ*V^&u(m';
-//$dbName = 'wecodesp_crm';
+$dbHost = '65.99.248.156';
+$dbUsuario = 'wecodesp_crm';
+$dbPassword = 'Hola.mundo!@2024';
+$dbName = 'wecodesp_crm';
 
-$dbHost = 'localhost';
-$dbUsuario = 'root';
-$dbPassword = '';
-$dbName = 'cerreme';
+//$dbHost = 'localhost';
+//$dbUsuario = 'root';
+//$dbPassword = '';
+//$dbName = 'cerreme';
 
 $conn = mysqli_connect($dbHost, $dbUsuario, $dbPassword, $dbName);
 
@@ -18,6 +18,7 @@ if (mysqli_connect_errno()) {
     exit();
 }
 else{
+    
 }
 
 // Establecer la zona horaria a México, Ciudad de México (CDMX)
