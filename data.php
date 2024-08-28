@@ -1,108 +1,56 @@
 <?php
 session_start(); // Iniciar sesión
 
+// Incluir la funcionalidad
+require 'Functions/DataF.php';
+require 'db.php';
+
 // Verificar si el paciente no ha iniciado sesión
-if (!isset($_SESSION["id"])) {
-    // Redireccionar al formulario de inicio de sesión
-    header("Location: index.php");
-    exit();
-}
+verificarSesion();
 
 // Verificar si el usuario tiene el tipo "cliente"
-if ($_SESSION["type"] === "Cliente") {
-    //obtener el nombre de la tabla mediante GET
-    $tabla = isset($_GET['id']) ? $_GET['id'] : '';
-    // Obtener el nombre del campo de cliente del usuario
-    $nombre_campo_cliente = obtenerNombreCampoCliente($_SESSION["id"]); // Ajusta esto según tu sistema
-    //verificar si el cliente es el mismo de la url para proteccion de datos
-    if ($nombre_campo_cliente != $tabla) {
-        // Redirigir al usuario a chart.php con los parámetros adecuados
-        header("Location: data.php?id=" . urlencode($nombre_campo_cliente));
-        exit();
-    }
-}
-
-function obtenerNombreCampoCliente($id_usuario)
-{
-    include 'db.php'; // Incluir la conexión a la base de datos
-
-    // Consulta SQL para obtener el nombre del campo de cliente del usuario
-    $sql = "SELECT cliente FROM users WHERE id = $id_usuario"; // Ajusta esto según tu estructura de base de datos y nombres de tablas y campos
-
-    $result = $conn->query($sql);
-
-    if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        return $row["cliente"];
-    } else {
-        return ""; // Si no se encuentra el campo, retorna una cadena vacía
-    }
-}
+verificarTipoCliente();
 
 include 'layouts/header.php';
-include 'db.php';
 
-// Obtener el ID de la imagen enviado por la URL
 $tabla = $_GET["id"];
-
 $mesFiltro = isset($_GET["mes"]) ? $_GET["mes"] : "";
 $anioFiltro = isset($_GET["anio"]) ? $_GET["anio"] : "";
-$query = "SELECT * FROM $tabla";
-if (!empty($mesFiltro) || !empty($anioFiltro)) {
-    $query .= " WHERE";
-    if (!empty($mesFiltro)) {
-        $query .= " MONTH(fecha) = '$mesFiltro'";
-        if (!empty($anioFiltro)) {
-            $query .= " AND";
-        }
-    }
-    if (!empty($anioFiltro)) {
-        $query .= " YEAR(fecha) = '$anioFiltro'";
-    }
-    $query .= " ORDER BY id DESC";
-} else {
-    $mesActual = date('m');  // Obtener el número del mes actual
-    $anioActual = date('Y'); // Obtener el año actual
-    $query .= " WHERE MONTH(fecha) = '$mesActual' AND YEAR(fecha) = '$anioActual' ORDER BY id DESC";
-}
 
-// Establecer la cantidad de registros por página
+$query = construirConsulta($tabla, $mesFiltro, $anioFiltro);
+
 $registrosPorPagina = 30;
-
-// Obtener el número de página actual
 $paginaActual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
-
-// Calcular el desplazamiento para la consulta SQL
 $desplazamiento = ($paginaActual - 1) * $registrosPorPagina;
 
-// Obtener el número total de registros
-$resultTotal = mysqli_query($conn, $query);
+$resultTotal = obtenerTotalRegistros($query);
 if ($resultTotal !== false) {
     $totalRegistros = mysqli_num_rows($resultTotal);
-
-    // Calcular el número total de páginas
     $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
 } else {
     echo 'Error en la consulta: ' . mysqli_error($conn);
-    exit(); // Salir del script si hay un error en la consulta
+    exit();
 }
 
-// Modificar la consulta SQL para incluir la paginación
 $query .= " LIMIT $desplazamiento, $registrosPorPagina";
-$result = mysqli_query($conn, $query);
+$result = obtenerDatos($query);
 ?>
+
+
+
 
 <div class="container">
     <div class="row justify-content-end">
-        <div class="col-md-4">
-            <!-- <form method="POST" action="carga.php" enctype="multipart/form-data" class="form-group">
-                <input type="file" id="csvFile" name="csvFile" accept=".csv" required style="display: none;">
-                <input type="hidden" name="clienteId" value="<?php echo $_GET['id']; ?>">
-                <button type="button" class="btn btn-primary" onclick="document.getElementById('csvFile').click();">Subir Archivo</button>
-                <button type="submit" class="btn btn-primary" id="submitBtn" name="submit" style="display: none;">Subir Archivo CSV</button>
-            </form> -->
-            <a class="btn btn-success" href="carga_csv.php/?tabla=<?php echo $_GET['id']; ?>">Carga CSV</a>
-        </div>
+        <?php
+
+        if ($_SESSION["type"] === "Super_Admin") {
+        ?>
+            <div class="col-md-4">
+                <a class="btn btn-success" href="Loadcsv.php/?tabla=<?php echo htmlspecialchars($_GET['id']); ?>">Carga CSV</a>
+            </div>
+        <?php
+        }
+        ?>
     </div>
 
     <div class="row">
@@ -172,12 +120,15 @@ $result = mysqli_query($conn, $query);
                             <thead class="thead-dark">
                                 <tr>
                                     <?php
+
                                     // Imprimir los encabezados (th) utilizando las columnas de la tabla
                                     $row = mysqli_fetch_assoc($result);
                                     foreach ($row as $column => $value) {
                                         echo '<th class="table-row" scope="col">' . $column . '</th>';
                                     }
-                                    echo '<th scope="col">borrar</th>'; // Añadir una columna para acciones
+                                    if ($_SESSION["type"] === "Super_Admin") {
+                                        echo '<th scope="col">borrar</th>'; // Añadir una columna para acciones
+                                    }
                                     ?>
                                 </tr>
                             </thead>
@@ -229,13 +180,21 @@ $result = mysqli_query($conn, $query);
                                             }
                                         }
                                         ?>
-                                        <td>
-                                            <form action="eliminar_registro.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar este registro?');">
-                                                <input type="hidden" name="tabla" value="<?php echo $tabla; ?>">
-                                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                            </form>
-                                        </td>
+                                        <?php
+
+                                        if ($_SESSION["type"] === "Super_Admin") {
+                                        ?>
+                                            <td>
+                                                <form action="eliminar_registro.php" method="POST" onsubmit="return confirm('¿Está seguro de que desea eliminar este registro?');">
+                                                    <input type="hidden" name="tabla" value="<?php echo $tabla; ?>">
+                                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                                                </form>
+                                            </td>
+                                        <?php
+                                        }
+                                        ?>
+
                                     </tr>
                                 <?php
                                 }

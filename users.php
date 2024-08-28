@@ -1,62 +1,48 @@
 <?php
-session_start(); // Iniciar sesión
-
-// Verificar si el usuario no ha iniciado sesión
-if (!isset($_SESSION["id"])) {
-    // Redireccionar al formulario de inicio de sesión
-    header("Location: index.php");
-    exit();
-}
-
-include 'logic/users.php';
+// Incluir el archivo de funciones
+include 'db.php'; // Incluye tu archivo de conexión a la base de datos
+include 'Functions/usersF.php'; 
+include 'logic/UsersF.php';
+// Iniciar sesión y verificar si el usuario ha iniciado sesión
+startSessionAndCheckLogin();
 include 'layouts/header.php';
 
+
 // Obtener las tablas de la base de datos
-$tablesQuery = "SHOW TABLES";
-$result = mysqli_query($conn, $tablesQuery);
-$tables = [];
-while ($row = mysqli_fetch_row($result)) {
-    // Si el nombre de la tabla no es 'users', agregarlo al array de tablas
-    if ($row[0] !== 'users') {
-        $tables[] = $row[0];
-    }
-}
-// Convertir el array de tablas a JSON para usarlo en JavaScript
+$tables = getDatabaseTables($conn);
 $tablesJson = json_encode($tables);
 
 // Verificar si se ha enviado el formulario de registro
 if (isset($_POST["registrar"])) {
-    // Recuperar los datos del formulario
     $name = $_POST["name"];
     $email = $_POST["email"];
     $password = $_POST["password"];
     $type = $_POST["type"];
+    $client_id = $type === 'Cliente' ? $_POST['client_id'] : null;
 
-    // Verificar si el tipo de usuario es "Cliente"
-    if ($type === 'Cliente') {
-        // Si es cliente, se asigna el valor del campo client_id
-        $client_id = $_POST['client_id'];
-    } else {
-        // Si no es cliente, se asigna null
-        $client_id = null;
-    }
-
-    // Prepara la consulta para insertar el nuevo usuario en la base de datos
-    $sql = "INSERT INTO users (name, email, password, type, cliente) VALUES (?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $sql);
-
-    // Verifica si la consulta se preparó correctamente
-    if ($stmt) {
-        // Vincula los parámetros y ejecuta la consulta
-        mysqli_stmt_bind_param($stmt, "sssss", $name, $email, $password, $type, $client_id);
-        mysqli_stmt_execute($stmt);
-
-        // Cierra la consulta preparada
-        mysqli_stmt_close($stmt);
-    } else {
-        echo 'Error en la consulta preparada: ' . mysqli_error($conn);
-    }
+    registerUser($conn, $name, $email, $password, $type, $client_id);
 }
+
+// Verificar si se ha enviado el formulario de eliminación
+if (isset($_POST["borrar"])) {
+    $id = $_POST["id"];
+    deleteUser($conn, $id);
+}
+
+// Verificar si se ha enviado el formulario de actualización
+if (isset($_POST["actualizar"])) {
+    $id = $_POST["id"];
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $type = $_POST["type"];
+    $client_id = $type === 'Cliente' ? $_POST['client_id'] : null;
+
+    updateUser($conn, $id, $name, $email, $password, $type, $client_id);
+}
+
+// Obtener la lista de usuarios
+$users = getUsers($conn);
 ?>
 
 <!-- Resto del código HTML -->
@@ -342,8 +328,8 @@ if (isset($_POST["registrar"])) {
 <!-- *** JS Custom *** -->
 
 <script>
-    // Escucha el evento clic del botón de editar
-    $(document).on('click', '.editar', function () {
+        // Escucha el evento clic del botón de editar
+        $(document).on('click', '.editar', function () {
         // Obtén los datos del registro seleccionado
         var id = $(this).data('id');
         var name = $(this).data('name');
